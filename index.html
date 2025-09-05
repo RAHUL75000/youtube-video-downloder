@@ -1,0 +1,150 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Downloader</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h2>Downloader</h2>
+    <nav>
+      <a href="#">Contact Me</a>
+      <a href="#">About Us</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="centred-box">
+      <textarea id="videoUrl" placeholder="Paste the YouTube URL"></textarea>
+      <button onclick="sendUrl()">Submit</button>
+    </div>
+  </main>
+
+  <footer></footer>
+
+  <script>
+    function sendUrl() {
+      const url = document.getElementById("videoUrl").value;
+      fetch("http://127.0.0.1:5500/process_url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_url: url })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to download");
+        return res.blob();
+      })
+      .then(blob => {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "video.mp4";
+        link.click();
+      })
+      .catch(err => console.error("Error:", err));
+    }
+  </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Downloader</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h2>Downloader</h2>
+    <nav>
+      <a href="#">Contact Me</a>
+      <a href="#">About Us</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="centred-box">
+      <textarea id="videoUrl" placeholder="Paste the YouTube URL"></textarea>
+      <button onclick="fetchInfo()">Get Info</button>
+    </div>
+
+    <div id="videoInfo" style="display:none; margin-top:20px;">
+      <h3 id="title"></h3>
+      <img id="thumbnail" width="200"><br><br>
+      <select id="format">
+        <option value="best">Best Quality</option>
+        <option value="1080p">1080p</option>
+        <option value="720p">720p</option>
+        <option value="mp3">MP3 (Audio Only)</option>
+      </select>
+      <button onclick="downloadVideo()" >Download</button>
+      <div style="margin-top:15px;">
+        <progress id="progressBar" value="0" max="100"></progress>
+        <span id="progressText">0%</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let videoId = null;
+
+    function fetchInfo() {
+      const url = document.getElementById("videoUrl").value;
+        fetch("/info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_url: url })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+        videoId = data.id;
+        document.getElementById("title").innerText = data.title;
+        document.getElementById("thumbnail").src = data.thumbnail;
+        document.getElementById("videoInfo").style.display = "block";
+      })
+      .catch(err => alert("Error: " + err));
+    }
+
+    function downloadVideo() {
+      const url = document.getElementById("videoUrl").value;
+      const fmt = document.getElementById("format").value;
+
+      fetch("/process_url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_url: url, format: fmt })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Download failed");
+        return res.blob();
+      })
+      .then(blob => {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "video." + (fmt === "mp3" ? "mp3" : "mp4");
+        link.click();
+      })
+      .catch(err => alert("Error: " + err));
+
+      // Start checking progress
+      if (videoId) {
+        const interval = setInterval(() => {
+          fetch(`/progress/${videoId}`)
+          .then(res => res.json())
+          .then(data => {
+            let percent = data.progress.replace("%","") || "0";
+            document.getElementById("progressBar").value = parseFloat(percent);
+            document.getElementById("progressText").innerText = data.progress;
+            if (percent === "100") clearInterval(interval);
+          });
+        }, 1000);
+      }
+    }
+  </script>
+</body>
+</html>

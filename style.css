@@ -1,0 +1,80 @@
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+
+header{
+  position: fixed; 
+  top: 0; 
+  width: 100%; 
+  background-color: whitesmoke; 
+  color: black; 
+  padding: 15px 20px; 
+  z-index: 1000; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header a{
+    color: black;
+    text-decoration: none;
+    padding: 5px 60px;
+    transition: color 0.3s ease;
+}
+header a:hover{
+    color: red;
+}
+header h2{
+    transition: color 0.3s ease;
+}
+header h2:hover{
+    color:red ;
+}
+
+main{
+    min-height: 1000px;
+    margin-top: 65px;
+    padding: 20px;
+  background-image: url('collabstr-nwCikL2T5qg-unsplash.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment:scroll;
+}
+.centred-box{
+    background-color: rgba(255,255,255,0.9);
+    padding: 40px;
+    margin-top: 190px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.centred-box textarea{
+    width: 100%;
+    max-width: 400px;
+    height: 50px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 1px;
+    resize: vertical;
+}
+
+.centred-box button{
+    background-color: #ccc;
+    color: #000;
+    margin-top: -20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.centred-box button:hover{
+    color: red;
+}
